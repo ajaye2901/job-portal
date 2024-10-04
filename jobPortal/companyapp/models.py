@@ -11,3 +11,16 @@ class Company(models .Model) :
 
     def __str__(self):
         return self.name
+    
+class JobListing(models.Model) :
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    requirements = models.TextField()
+    salary = models.IntegerField()
+    location = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) :
+        return self.title
