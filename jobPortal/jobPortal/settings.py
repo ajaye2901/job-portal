@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     'userapp',
     'companyapp',
+    'candidateapp',
 
     'rest_framework',
     'rest_framework_simplejwt',
