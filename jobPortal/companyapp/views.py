@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .serializers import CompanySerializers
+from userapp.permissions import IsEmployerUser
 
 # Create your views here.
 
@@ -19,7 +20,7 @@ Header -> Bearer Token
 """
 
 class CompanyCreateView(APIView) :
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsEmployerUser]
 
     def post(self, request) :
         data = request.data.copy()  # Copy request data
