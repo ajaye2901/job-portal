@@ -10,6 +10,7 @@ from companyapp.serializers import JobListingSerializers
 from django.shortcuts import get_object_or_404
 from .models import JobApplication
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 
 class JobApplicationView(APIView) :
     permission_classes = [IsCandidateUser]
@@ -27,10 +28,15 @@ class JobApplicationView(APIView) :
 class AllJobsView(APIView) :
     permission_classes = [IsCandidateUser]
 
-    def get(self, request) :
-        jobs = JobListing.objects.filter(is_active = True)
-        serializer = JobListingSerializers(jobs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request):
+        jobs = JobListing.objects.filter(is_active=True)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_jobs = paginator.paginate_queryset(jobs, request)
+        serializer = JobListingSerializers(paginated_jobs, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class JobDetailedView(APIView) :
     permission_classes = [IsCandidateUser]
@@ -46,8 +52,13 @@ class AllJobApplicationView(APIView) :
     def get(self, request) :
         user = request.user
         job_applications = JobApplication.objects.filter(candidate=user)
-        serializer = JobApplicationSerializer(job_applications, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_application = paginator.paginate_queryset(job_applications, request)
+        serializer = JobApplicationSerializer(paginated_application, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class JobApplicationDetailedview(APIView) :
     permission_classes = [IsCandidateUser]
@@ -86,5 +97,9 @@ class JobListingFilterView(APIView) :
         if location:
             queryset = queryset.filter(location__icontains=location)
         
-        serializer = JobListingSerializers(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_jobs = paginator.paginate_queryset(queryset, request)
+        serializer = JobListingSerializers(paginated_jobs, many=True)
+        return paginator.get_paginated_response(serializer.data)
