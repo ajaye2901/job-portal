@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from candidateapp.models import JobApplication
 from candidateapp.serializers import JobApplicationSerializer
 from django.db.models import Q
+from rest_framework.pagination import PageNumberPagination
 
 User = get_user_model()
 
@@ -103,8 +104,12 @@ class AdminAllJobsView(APIView) :
 
     def get(self, request) :
         jobs = JobListing.objects.all()
-        serializer = JobListingSerializers(jobs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_jobs = paginator.paginate_queryset(jobs, request)
+        serializer = JobListingSerializers(paginated_jobs, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def delete(self, request, job_id) :
         job = get_object_or_404(JobListing, id=job_id)
@@ -116,8 +121,13 @@ class AdminJobApplicationsView(APIView) :
 
     def get(self, request) :
         applications = JobApplication.objects.all()
-        serializer = JobApplicationSerializer(applications, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_application = paginator.paginate_queryset(applications, request)
+        serializer = JobApplicationSerializer(paginated_application, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def delete(self, request, application_id) :
         application = get_object_or_404(JobApplication, id=application_id)
@@ -129,8 +139,13 @@ class AllUsersView(APIView) :
 
     def get(self, request) :
         users = User.objects.exclude(role='Admin')
-        serializer = UserRegistrationSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_application = paginator.paginate_queryset(users, request)
+        serializer = UserRegistrationSerializer(paginated_application, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     def delete(self, request, user_id) :
         user = get_object_or_404(User, id=user_id)
@@ -158,6 +173,10 @@ class AdminJobListingFilterView(APIView) :
         if location:
             queryset = queryset.filter(location__icontains=location)
         
-        serializer = JobListingSerializers(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_jobs = paginator.paginate_queryset(queryset, request)
+        serializer = JobListingSerializers(paginated_jobs, many=True)
+        return paginator.get_paginated_response(serializer.data)
 

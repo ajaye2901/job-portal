@@ -9,6 +9,7 @@ from userapp.permissions import IsEmployerUser
 from rest_framework import viewsets     
 from candidateapp.models import JobApplication
 from candidateapp.serializers import JobApplicationSerializer
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 """
@@ -65,8 +66,14 @@ class AllJobApplicationsView(APIView) :
     def get(self, request) :
         user = request.user
         job_applications = JobApplication.objects.filter(job__company__owner=user)
-        serializer = JobApplicationSerializer(job_applications, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        paginated_application = paginator.paginate_queryset(job_applications, request)
+        serializer = JobApplicationSerializer(paginated_application, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
     
 class ApplicationStatusChangeView(APIView) :
     permission_classes = [IsEmployerUser]
