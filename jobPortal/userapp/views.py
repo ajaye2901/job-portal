@@ -105,9 +105,6 @@ class AdminAllJobsView(APIView) :
         serializer = JobListingSerializers(jobs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class AdminDeleteJobsView(APIView) :
-    permission_classes = [IsAdminUser]
-
     def delete(self, request, job_id) :
         job = get_object_or_404(JobListing, id=job_id)
         job.delete()
@@ -138,3 +135,4 @@ class AllUsersView(APIView) :
         user = get_object_or_404(User, id=user_id)
         user.delete()
         return Response({'message' : 'User deleted Successfully'}, status=status.HTTP_204_NO_CONTENT)
+
