@@ -48,3 +48,18 @@ class AllJobApplicationView(APIView) :
         serializer = JobApplicationSerializer(job_applications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class JobApplicationDetailedview(APIView) :
+    permission_classes = [IsCandidateUser]
+
+    def get(self, request, application_id) :
+        application = get_object_or_404(JobApplication, id=application_id)
+        serializer = JobApplicationSerializer(application)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class JobApplicationDelete(APIView) :
+    permission_classes = [IsCandidateUser]
+
+    def delete(self, request, application_id) :
+        application = get_object_or_404(JobApplication, id=application_id)
+        application.delete()
+        return Response({"message" : "Application deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
