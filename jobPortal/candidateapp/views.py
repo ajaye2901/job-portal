@@ -56,7 +56,7 @@ class JobApplicationDetailedview(APIView) :
         serializer = JobApplicationSerializer(application)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class JobApplicationDelete(APIView) :
+class JobApplicationDeleteView(APIView) :
     permission_classes = [IsCandidateUser]
 
     def delete(self, request, application_id) :
