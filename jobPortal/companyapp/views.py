@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from .models import *
-from .serializers import CompanySerializers, JobListingSerializers
+from .serializers import CompanySerializers, JobListingSerializers, JobApplicationStatusSerializer
 from userapp.permissions import IsEmployerUser
 from rest_framework import viewsets     
-
+from candidateapp.models import JobApplication
+from candidateapp.serializers import JobApplicationSerializer
 # Create your views here.
 
 """
@@ -57,3 +58,23 @@ class JobListingView(viewsets.ModelViewSet) :
         user = self.request.user
         company = Company.objects.filter(owner=user).first()
         serializer.save(company=company)
+
+class AllJobApplicationsView(APIView) :
+    permission_classes = [IsEmployerUser]
+
+    def get(self, request) :
+        user = request.user
+        job_applications = JobApplication.objects.filter(job__company__owner=user)
+        serializer = JobApplicationSerializer(job_applications, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+    
+class ApplicationStatusChangeView(APIView) :
+    permission_classes = [IsEmployerUser]
+
+    def patch(self, request, application_id) :
+        application = JobApplication.objects.get(id=application_id)
+        serializer = JobApplicationStatusSerializer(application, data=request.data, partial=True)
+        if serializer.is_valid() :
+            serializer.save()
+            return Response({'message' : 'Status Updated'}, status=status.HTTP_200_OK)
+
