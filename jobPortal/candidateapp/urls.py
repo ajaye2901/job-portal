@@ -8,4 +8,5 @@ urlpatterns = [
     path('job-applications/', AllJobApplicationView.as_view(), name='job-applications'),
     path('detailed-application/<int:application_id>/', JobApplicationDetailedview.as_view(), name='detailed-application'),
     path('delete-jobapplication/<int:application_id>/', JobApplicationDeleteView.as_view(), name='delete-jobapplication'),
+    path('jobs/', JobListingFilterView.as_view(), name='job-filter')    
 ]

@@ -11,6 +11,7 @@ urlpatterns = [
     path('superuser/job-applications/', AdminJobApplicationsView.as_view(), name='job-applications'),
     path('superuser/delete-application/<int:application_id>/', AdminJobApplicationsView.as_view(), name='delete-jobapplications'),
     path('superuser/allusers/', AllUsersView.as_view(), name='allusers'),
-    path('superuser/delete-user/<int:user_id>/', AllUsersView.as_view(), name='user-delete')
+    path('superuser/delete-user/<int:user_id>/', AllUsersView.as_view(), name='user-delete'),
+    path('superuser/jobs/', AdminJobListingFilterView.as_view(), name='job-filter')
 
 ]

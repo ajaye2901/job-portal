@@ -13,6 +13,7 @@ from companyapp.serializers import JobListingSerializers
 from django.shortcuts import get_object_or_404
 from candidateapp.models import JobApplication
 from candidateapp.serializers import JobApplicationSerializer
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -135,4 +136,28 @@ class AllUsersView(APIView) :
         user = get_object_or_404(User, id=user_id)
         user.delete()
         return Response({'message' : 'User deleted Successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+class AdminJobListingFilterView(APIView) :
+    permission_classes = [IsAdminUser]
+    def get(self, request):
+        queryset = JobListing.objects.all()
+
+        search_query = request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) | 
+                Q(company__name__icontains=search_query) | 
+                Q(location__icontains=search_query)
+            )
+
+        salary = request.query_params.get('salary', None)
+        if salary:
+            queryset = queryset.filter(salary__gte=salary)
+
+        location = request.query_params.get('location', None)
+        if location:
+            queryset = queryset.filter(location__icontains=location)
+        
+        serializer = JobListingSerializers(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
